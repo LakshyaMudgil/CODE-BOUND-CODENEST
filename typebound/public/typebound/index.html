@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TYPEBOUND - a souls-like typing combat game for CodeNest. Master the keyboard. Defeat the abyss." />
+  <meta name="theme-color" content="#0a0612" />
+  <title>TYPEBOUND — Master the Keyboard. Defeat the Abyss.</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/hud.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body class="bg-abyss">
+  <!-- ================= GAME ROOT ================= -->
+  <div id="game-root">
+
+    <!-- Background canvas for ambient particles / fog (menu + game) -->
+    <canvas id="fx-canvas" class="layer-canvas"></canvas>
+
+    <!-- ================= TITLE / MENU SCREEN ================= -->
+    <section id="screen-menu" class="screen screen--active">
+      <div class="menu-vignette"></div>
+      <div class="menu-content">
+        <p class="menu-eyebrow">CODENEST PRESENTS</p>
+        <h1 class="menu-title" data-text="TYPEBOUND">TYPEBOUND</h1>
+        <p class="menu-subtitle">MASTER THE KEYBOARD. DEFEAT THE ABYSS.</p>
+
+        <nav class="menu-buttons">
+          <button class="btn btn--primary" data-action="start">START</button>
+          <button class="btn" data-action="howto">HOW TO PLAY</button>
+          <button class="btn" data-action="settings">SETTINGS</button>
+        </nav>
+
+        <p class="menu-footer">A souls-like typing trial · Prototype v0.1 · Boss: The Glitched Knight</p>
+      </div>
+    </section>
+
+    <!-- ================= HOW TO PLAY OVERLAY ================= -->
+    <div id="overlay-howto" class="overlay">
+      <div class="overlay-card">
+        <h2 class="overlay-title">HOW TO PLAY</h2>
+        <div class="howto-grid">
+          <div class="howto-block">
+            <h3>THE LOOP</h3>
+            <p>Type attack words to strike. Watch the boss telegraph, then <strong>dodge</strong> or <strong>parry</strong>. Break its poise to <strong>stagger</strong> it, then land a <strong>riposte</strong> for massive damage.</p>
+          </div>
+          <div class="howto-block">
+            <h3>TYPING = YOUR BLADE</h3>
+            <p>A word glows at the bottom. Type it exactly. Long words are heavy attacks. 100% accuracy + high combo = <strong>critical hits</strong>.</p>
+          </div>
+          <div class="howto-block">
+            <h3>COMBAT KEYS</h3>
+            <ul class="key-list">
+              <li><kbd>←</kbd> dodge left</li>
+              <li><kbd>→</kbd> dodge right</li>
+              <li><kbd>↓</kbd> dodge back</li>
+              <li><kbd>Shift</kbd> parry</li>
+              <li><kbd>Space</kbd> overdrive (when focus is full)</li>
+            </ul>
+          </div>
+          <div class="howto-block">
+            <h3>STAMINA</h3>
+            <p>Dodging, parrying and attacking drain stamina. If it empties, you can't act — back off and let it recover. Manage it or die.</p>
+          </div>
+          <div class="howto-block">
+            <h3>PARRY WINDOW</h3>
+            <p>When the boss glows and a ring closes in, press <kbd>Shift</kbd> at the right instant. A <strong>perfect parry</strong> staggers the boss and opens a riposte.</p>
+          </div>
+          <div class="howto-block">
+            <h3>DEBUG</h3>
+            <p><kbd>F3</kbd> toggle debug overlay. <kbd>F4</kbd> heal · <kbd>F5</kbd> hurt boss · <kbd>F6</kbd> stagger boss · <kbd>F7</kbd> fill focus.</p>
+          </div>
+        </div>
+        <button class="btn btn--primary" data-action="close-overlay">GOT IT</button>
+      </div>
+    </div>
+
+    <!-- ================= SETTINGS OVERLAY ================= -->
+    <div id="overlay-settings" class="overlay">
+      <div class="overlay-card overlay-card--narrow">
+        <h2 class="overlay-title">SETTINGS</h2>
+        <div class="setting-row">
+          <label for="set-sfx">Sound Effects</label>
+          <input type="range" id="set-sfx" min="0" max="100" value="70" />
+        </div>
+        <div class="setting-row">
+          <label for="set-music">Music</label>
+          <input type="range" id="set-music" min="0" max="100" value="45" />
+        </div>
+        <div class="setting-row">
+          <label for="set-shake">Screen Shake</label>
+          <input type="checkbox" id="set-shake" checked />
+        </div>
+        <div class="setting-row">
+          <label for="set-flash">Damage Flash</label>
+          <input type="checkbox" id="set-flash" checked />
+        </div>
+        <button class="btn btn--primary" data-action="close-overlay">CLOSE</button>
+      </div>
+    </div>
+
+    <!-- ================= BOSS INTRO ================= -->
+    <section id="screen-intro" class="screen">
+      <div class="intro-backdrop"></div>
+      <div class="intro-content">
+        <p class="intro-tier">TIER II · THE CORRUPTED CODEX</p>
+        <h2 class="intro-name" data-text="THE GLITCHED KNIGHT">THE GLITCHED KNIGHT</h2>
+        <p class="intro-tag">// SYNTAX IS LAW. ERRORS ARE DEATH. //</p>
+      </div>
+    </section>
+
+    <!-- ================= GAME / ARENA SCREEN ================= -->
+    <section id="screen-game" class="screen">
+      <!-- The battlefield canvas -->
+      <canvas id="game-canvas" class="layer-canvas"></canvas>
+
+      <!-- Vignette + damage flash overlays -->
+      <div id="vignette" class="vignette"></div>
+      <div id="damage-flash" class="damage-flash"></div>
+      <div id="slowmo-tint" class="slowmo-tint"></div>
+
+      <!-- ============ HUD (DOM overlay) ============ -->
+      <div id="hud" class="hud">
+        <!-- Player panel -->
+        <div class="hud-player">
+          <div class="hud-name">YOU <span class="hud-weapon" id="hud-weapon">RAPID BLADE</span></div>
+          <div class="bar bar--hp">
+            <div class="bar-fill" id="player-hp-fill"></div>
+            <span class="bar-label" id="player-hp-label">100 / 100</span>
+          </div>
+          <div class="bar bar--stamina">
+            <div class="bar-fill" id="player-stamina-fill"></div>
+          </div>
+          <div class="bar bar--focus">
+            <div class="bar-fill" id="player-focus-fill"></div>
+            <span class="bar-tag" id="focus-ready">FOCUS</span>
+          </div>
+          <div class="hud-stats">
+            <span>WPM <b id="stat-wpm">0</b></span>
+            <span>ACC <b id="stat-acc">100%</b></span>
+          </div>
+        </div>
+
+        <!-- Boss panel -->
+        <div class="hud-boss">
+          <div class="hud-boss-name" id="boss-name">THE GLITCHED KNIGHT</div>
+          <div class="hud-boss-phase" id="boss-phase">PHASE I</div>
+          <div class="bar bar--boss-hp">
+            <div class="bar-fill" id="boss-hp-fill"></div>
+          </div>
+          <div class="bar bar--stagger">
+            <div class="bar-fill" id="boss-stagger-fill"></div>
+            <span class="bar-tag">POISE</span>
+          </div>
+        </div>
+
+        <!-- Combo -->
+        <div class="hud-combo" id="hud-combo">
+          <span class="combo-x">x</span><span class="combo-n" id="combo-n">0</span>
+        </div>
+
+        <!-- Center action banner (PERFECT PARRY, RIPOSTE, etc.) -->
+        <div class="action-banner" id="action-banner"></div>
+
+        <!-- Typing zone -->
+        <div class="typing-zone" id="typing-zone">
+          <div class="typing-word" id="typing-word"></div>
+          <p class="typing-hint" id="typing-hint">TYPE TO ATTACK</p>
+        </div>
+
+        <!-- Debug overlay -->
+        <pre id="debug-overlay" class="debug-overlay"></pre>
+      </div>
+    </section>
+
+    <!-- ================= RESULT SCREEN (death / victory) ================= -->
+    <section id="screen-result" class="screen">
+      <div class="result-content">
+        <h2 class="result-title" id="result-title">YOU DIED</h2>
+        <p class="result-sub" id="result-sub">THE GLITCHED KNIGHT PREVAILS</p>
+
+        <div class="result-stats" id="result-stats"></div>
+        <div class="result-reward" id="result-reward"></div>
+
+        <div class="result-buttons">
+          <button class="btn btn--primary" data-action="retry">TRY AGAIN</button>
+          <button class="btn" data-action="menu">MAIN MENU</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ================= SCRIPTS (modular, ordered) ================= -->
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/typing.js"></script>
+  <script src="js/weapons.js"></script>
+  <script src="js/stamina.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/boss.js"></script>
+  <script src="js/arena.js"></script>
+  <script src="js/bosses/glitchedKnight.js"></script>
+  <script src="js/combat.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

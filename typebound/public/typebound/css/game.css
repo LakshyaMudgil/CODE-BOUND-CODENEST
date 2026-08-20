@@ -1,0 +1,53 @@
+/* ============================================================
+   TYPEBOUND — arena / screen effects (non-HUD)
+   ============================================================ */
+
+#screen-game.screen--active { background: #04020a; }
+
+/* Cinematic vignette that always frames the fight */
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background:
+    radial-gradient(75% 75% at 50% 45%, transparent 55%, rgba(3,1,8,0.85) 100%);
+  transition: background 0.4s ease;
+}
+.vignette.enraged {
+  background:
+    radial-gradient(75% 75% at 50% 45%, transparent 45%, rgba(60,4,30,0.9) 100%);
+}
+
+/* Full-screen red flash on player damage */
+.damage-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 60%, rgba(255,40,80,0.0), rgba(255,20,60,0.0));
+  opacity: 0;
+}
+.damage-flash.hit {
+  animation: dmg-flash 0.35s ease-out;
+}
+
+/* Slow-mo blue tint during perfect parry */
+.slowmo-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(53,232,255,0.12), rgba(120,60,255,0.10));
+  mix-blend-mode: screen;
+}
+.slowmo-tint.active {
+  opacity: 1;
+  transition: opacity 0.08s ease;
+}
+
+/* Screen shake is applied to the whole root via transform (JS sets --shake-x/y) */
+#game-root {
+  transform: translate(var(--shake-x, 0px), var(--shake-y, 0px));
+}

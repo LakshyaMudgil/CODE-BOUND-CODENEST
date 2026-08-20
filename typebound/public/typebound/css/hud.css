@@ -1,0 +1,244 @@
+/* ============================================================
+   TYPEBOUND — HUD (health / stamina / focus / boss / combo / typing)
+   ============================================================ */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  font-family: var(--font-mono);
+}
+
+/* ---------- generic bar ---------- */
+.bar {
+  position: relative;
+  height: 14px;
+  background: rgba(6,3,14,0.72);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+}
+.bar-fill {
+  position: absolute;
+  inset: 0;
+  right: auto;
+  width: 100%;
+  transform-origin: left center;
+  transition: width 0.25s cubic-bezier(0.2,0.7,0.2,1);
+}
+.bar-label, .bar-tag {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+.bar-label { right: 8px; }
+.bar-tag   { left: 8px; color: var(--bone-dim); }
+
+/* ---------- player panel (top-left) ---------- */
+.hud-player {
+  position: absolute;
+  top: 26px;
+  left: 30px;
+  width: 340px;
+  display: grid;
+  gap: 7px;
+}
+.hud-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  color: var(--bone);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hud-weapon {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  color: var(--cyan);
+  border: 1px solid rgba(53,232,255,0.35);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.bar--hp    { height: 18px; }
+.bar--hp    .bar-fill { background: linear-gradient(90deg, #ff3b6b, #ff7aa0); box-shadow: 0 0 12px rgba(255,59,107,0.5); }
+.bar--stamina .bar-fill { background: linear-gradient(90deg, #38d99a, #8bffcf); }
+.bar--focus { height: 10px; }
+.bar--focus .bar-fill { background: linear-gradient(90deg, #7b2fff, #c98bff); }
+.bar--focus.ready { border-color: var(--violet); box-shadow: 0 0 16px rgba(164,77,255,0.6); }
+.bar--focus.ready .bar-fill { animation: focus-pulse 0.9s ease-in-out infinite; }
+#focus-ready { opacity: 0; transition: opacity 0.2s; }
+.bar--focus.ready #focus-ready { opacity: 1; color: var(--bone); }
+
+.hud-stats {
+  display: flex;
+  gap: 18px;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--bone-dim);
+  margin-top: 2px;
+}
+.hud-stats b { color: var(--cyan); font-weight: 700; }
+
+/* ---------- boss panel (top-center/right) ---------- */
+.hud-boss {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, 46vw);
+  text-align: center;
+  display: grid;
+  gap: 7px;
+  justify-items: center;
+}
+.hud-boss-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.22em;
+  color: var(--bone);
+  text-shadow: 0 0 18px rgba(164,77,255,0.55);
+}
+.hud-boss-phase {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  color: var(--violet);
+}
+.bar--boss-hp {
+  width: 100%;
+  height: 16px;
+}
+.bar--boss-hp .bar-fill {
+  background: linear-gradient(90deg, #7b2fff, #ff2fb9);
+  box-shadow: 0 0 14px rgba(164,77,255,0.6);
+}
+.bar--stagger {
+  width: 62%;
+  height: 8px;
+}
+.bar--stagger .bar-fill {
+  background: linear-gradient(90deg, #b98a2e, #ffd27a);
+  width: 0%;
+}
+.bar--stagger.full .bar-fill { animation: focus-pulse 0.5s infinite; }
+
+/* ---------- combo (right) ---------- */
+.hud-combo {
+  position: absolute;
+  top: 120px;
+  right: 40px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--magenta-soft);
+  text-shadow: 0 0 20px rgba(255,47,185,0.6);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.hud-combo.show { opacity: 1; transform: translateY(0); }
+.combo-x { font-size: 1.4rem; opacity: 0.7; }
+.combo-n { font-size: 3.4rem; line-height: 1; }
+.hud-combo.bump { animation: combo-bump 0.25s ease; }
+
+/* ---------- center action banner ---------- */
+.action-banner {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 0.1em;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.action-banner.show { animation: banner-pop 1.1s ease forwards; }
+.action-banner.parry  { color: var(--cyan);    text-shadow: 0 0 30px rgba(53,232,255,0.8); }
+.action-banner.dodge  { color: var(--stamina); text-shadow: 0 0 26px rgba(139,255,207,0.7); }
+.action-banner.crit   { color: var(--magenta); text-shadow: 0 0 30px rgba(255,47,185,0.9); }
+.action-banner.riposte{ color: var(--gold);    text-shadow: 0 0 34px rgba(255,210,122,0.9); }
+.action-banner.stagger{ color: var(--gold);    text-shadow: 0 0 30px rgba(255,210,122,0.85); }
+.action-banner.phase  { color: var(--violet);  text-shadow: 0 0 40px rgba(164,77,255,0.9); font-size: clamp(2.6rem,7vw,6rem); }
+.action-banner.fail   { color: var(--hp);      text-shadow: 0 0 24px rgba(255,59,107,0.7); }
+
+/* ---------- typing zone ---------- */
+.typing-zone {
+  position: absolute;
+  bottom: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  min-width: 360px;
+}
+.typing-word {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  letter-spacing: 0.05em;
+  padding: 0.5rem 2rem;
+  display: inline-block;
+  min-height: 1.4em;
+  filter: drop-shadow(0 0 20px rgba(164,77,255,0.35));
+}
+.typing-word .char { color: var(--bone-dim); transition: color 0.06s; position: relative; }
+.typing-word .char.done  { color: var(--cyan); text-shadow: 0 0 12px rgba(53,232,255,0.7); }
+.typing-word .char.wrong { color: var(--hp); background: rgba(255,59,107,0.18); border-radius: 3px; }
+.typing-word .char.cursor::after {
+  content: "";
+  position: absolute;
+  left: -2px; right: -2px; bottom: -4px;
+  height: 3px;
+  background: var(--magenta);
+  box-shadow: 0 0 10px var(--magenta);
+  animation: caret-blink 0.9s steps(1) infinite;
+}
+.typing-word.riposte-word { color: var(--gold); }
+.typing-word.riposte-word .char.done { color: var(--gold); text-shadow: 0 0 14px rgba(255,210,122,0.8); }
+.typing-word.locked { opacity: 0.35; filter: grayscale(0.6); }
+
+.typing-hint {
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  color: var(--bone-dim);
+}
+.typing-hint.warn { color: var(--hp); }
+.typing-hint.good { color: var(--stamina); }
+
+/* ---------- debug overlay ---------- */
+.debug-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 20;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: #7CFC9E;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(124,252,158,0.25);
+  border-radius: 4px;
+  padding: 8px 12px;
+  white-space: pre;
+  display: none;
+  pointer-events: none;
+}
+.debug-overlay.show { display: block; }
+
+/* floating damage numbers are drawn on canvas, but crit text uses DOM helper */
+@media (max-width: 900px) {
+  .hud-player { width: 260px; top: 14px; left: 14px; }
+  .hud-boss { top: 14px; }
+  .hud-combo { top: 100px; right: 16px; }
+}

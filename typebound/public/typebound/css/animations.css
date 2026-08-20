@@ -1,0 +1,60 @@
+/* ============================================================
+   TYPEBOUND — keyframe animations
+   ============================================================ */
+
+@keyframes title-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-4px) scale(1.005); }
+}
+
+@keyframes glitch-shift-a {
+  0%, 92%, 100% { transform: translate(0,0); }
+  93% { transform: translate(-3px, 1px); }
+  96% { transform: translate(2px, -2px); }
+}
+@keyframes glitch-shift-b {
+  0%, 90%, 100% { transform: translate(0,0); }
+  91% { transform: translate(3px, -1px); }
+  95% { transform: translate(-2px, 2px); }
+}
+
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+@keyframes dmg-flash {
+  0%   { opacity: 0; background: radial-gradient(circle at 50% 60%, rgba(255,40,80,0.0), rgba(255,20,60,0.0)); }
+  15%  { opacity: 1; background: radial-gradient(circle at 50% 60%, rgba(255,40,80,0.35), rgba(255,20,60,0.5)); }
+  100% { opacity: 0; background: radial-gradient(circle at 50% 60%, rgba(255,40,80,0.0), rgba(255,20,60,0.0)); }
+}
+
+@keyframes focus-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.5); }
+}
+
+@keyframes combo-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+@keyframes banner-pop {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.7); }
+  15%  { opacity: 1; transform: translate(-50%,-50%) scale(1.06); }
+  70%  { opacity: 1; transform: translate(-50%,-50%) scale(1.0); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.04); }
+}
+
+@keyframes caret-blink {
+  0%, 50%  { opacity: 1; }
+  51%,100% { opacity: 0.15; }
+}
+
+/* reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .menu-title, .intro-name { animation: none; }
+  .menu-title::before, .menu-title::after,
+  .intro-name::before, .intro-name::after { animation: none; opacity: 0.3; }
+}
